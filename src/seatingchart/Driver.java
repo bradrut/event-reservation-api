@@ -3,7 +3,6 @@ package seatingchart;
 import chartprinter.SeatingChartPrinter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -18,22 +17,39 @@ public class Driver {
         SeatingChart chart = new SeatingChart(3, 11);
         SeatingChartPrinter printer = new SeatingChartPrinter(chart);
         
-        /*
         Scanner scanner = new Scanner(System.in);
-        try(scanner){
-            System.out.print("Enter a single seat to reserve: ");
-            String seat = scanner.next(Pattern.compile("R\\d+C\\d+"));
-            System.out.println("\n" + seat);
-        }catch(InputMismatchException e){
-            System.out.println(e.);
-        }
-        */
         
-        chart.reserveSeat(1, 5);
-        chart.reserveSeat(1, 6);
-        chart.reserveSeat(1, 11);
-        chart.reserveSeat(2, 4);
-        chart.reserveSeat(2, 12);
+        // Retrieve valid input for initial reservations.
+        String seats = "";
+        while(true){
+            try{
+                seats = scanner.nextLine();
+                if(seats.matches("(R\\d+C\\d+\\s?)+") || seats.matches("")){
+                    break;
+                }else{
+                    throw new InputMismatchException();
+                }
+            }catch(InputMismatchException e){
+                System.out.println("Error: Enter initial reservations in the form 'R1C1', or hit enter.");
+                seats = "";
+            }
+        }
+        
+        //Parse initial reservation seat locations and reserve.
+        if(!seats.equals("")){
+            String[] parsedSeats = seats.split(" ");
+            for(String seatLoc : parsedSeats){
+                String[] parsedLoc = seatLoc.split("R|C");
+                chart.reserveSeat(Integer.parseInt(parsedLoc[1]), Integer.parseInt(parsedLoc[2]));
+            }
+        }
+        
+        // TODO: Set delimiter on scanner to take integers.
+        while(true){
+            // TODO: Take integers to be used for group reservations.
+            break;
+        }
+        
         printer.printAvailability();
     }
     

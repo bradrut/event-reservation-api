@@ -22,18 +22,9 @@ public class Row {
     }
     
     String reserveSeat(int colNum){
-        try{
-            if(seats[colNum-1].available()){
-                seats[colNum-1].setAvailability(false);
-                numAvailable--;
-                return seats[colNum-1].getLocation();
-            }else{
-                return "Seat at " + seats[colNum-1].getLocation() + " not available.";
-            }
-        }catch(IndexOutOfBoundsException e){
-            System.out.printf("Error: Seat at R%dC%d does not exist.\n\n", rowNum, colNum);
-            return null;
-        }
+        seats[colNum-1].setAvailability(false);
+        numAvailable--;
+        return seats[colNum-1].getLocation();
     }
     
     String reserveGroup(int groupSize){

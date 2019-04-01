@@ -19,6 +19,11 @@ public class SeatingChart {
         numAvailable = numRows*numColumns;
     }
     
+    /*
+    *  This method is for use by the SeatingChartPrinter. Any methods in the
+    *  'Row' class that modify data are set to package private, so that objects
+    *  outside of the 'seatingchart' can only read from the chart, never modify.
+    */
     public Row[] getRows(){
         return rows;
     }
@@ -34,12 +39,22 @@ public class SeatingChart {
     /*
     * 
     */
-    public boolean checkAvailability(int row, int column){
-        return false;
+    public boolean checkAvailability(int rowNum, int colNum){
+        try{
+            return rows[rowNum-1].getSeats()[colNum-1].available();
+        }catch(IndexOutOfBoundsException e){
+            System.out.printf("Error: Seat at location R%dC%d does not exist.\n", rowNum, colNum);
+            throw e;
+        }
     }
     
-    String reserveSeat(int row, int column){
-        return rows[row-1].reserveSeat(column);
+    String reserveSeat(int rowNum, int colNum){
+        if(checkAvailability(rowNum, colNum)){
+            numAvailable--;
+            return rows[rowNum-1].reserveSeat(colNum);
+        }else{
+            return null;
+        }
     }
     
     boolean makeInitialReservations(String seatLocations){
