@@ -39,8 +39,8 @@ public class SeatingChartPrinter {
         for(int i=0; i<rows.length; i++){
             System.out.print(i+1 + "|");
             Seat[] seats = rows[i].getSeats();
-            for(int j=0; j<seats.length; j++){
-                if(seats[j].available()){
+            for(Seat seat : seats){
+                if(seat.available()){
                     System.out.print("o  ");
                 }else{
                     System.out.print("x  ");
