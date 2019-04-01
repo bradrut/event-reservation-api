@@ -10,10 +10,10 @@ public class Seat {
     private final int manhattanDistance;
     private final String location;
     
-    public Seat(int row, int column, int rowTotal){
+    public Seat(int rowNum, int colNum, int rowTotal){
         available = true;
-        manhattanDistance = calculateManhattanDistance(row, column, rowTotal);
-        location = String.format("R%dC%d", row, column);
+        manhattanDistance = calculateManhattanDistance(rowNum, colNum, rowTotal);
+        location = String.format("R%dC%d", rowNum, colNum);
     }
     
     public boolean available(){

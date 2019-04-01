@@ -14,12 +14,14 @@ public class Driver {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
+
         SeatingChart chart = new SeatingChart(3, 11);
         SeatingChartPrinter printer = new SeatingChartPrinter(chart);
         
         Scanner scanner = new Scanner(System.in);
         
         // Retrieve valid input for initial reservations.
+        // Sample input: R1C1 R2C2 R1C6 R2C5 R2C6 R2C11 R3C5
         String seats = "";
         while(true){
             try{
@@ -44,13 +46,27 @@ public class Driver {
             }
         }
         
-        // TODO: Set delimiter on scanner to take integers.
         while(true){
-            // TODO: Take integers to be used for group reservations.
-            break;
+            String input;
+            try{
+                input = scanner.nextLine();
+                if(input.matches("\\d+") && !input.equals("-1")){
+                    chart.requestGroupReservation(Integer.parseInt(input));
+                }else if(input.equals("") || input.equals("-1")){
+                    break;
+                }else{
+                    throw new InputMismatchException();
+                }
+            }catch(InputMismatchException e){
+                System.out.println("Error: Expected integer for group reservation.");
+                throw e;
+            }
         }
         
+        // TODO: END PROGRAM SEQUENCE (see requirements).
+        
         printer.printAvailability();
+        printer.printDistances();
     }
     
 }

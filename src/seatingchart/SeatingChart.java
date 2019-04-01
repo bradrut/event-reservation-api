@@ -19,11 +19,14 @@ public class SeatingChart {
         numAvailable = numRows*numColumns;
     }
     
-    /*
-    *  This method is for use by the SeatingChartPrinter. Any methods in the
-    *  'Row' class that modify data are set to package private, so that objects
-    *  outside of the 'seatingchart' can only read from the chart, never modify.
-    */
+    /**
+     * Returns the array of Row objects contained within this SeatingChart. This 
+     * method is for use by the SeatingChartPrinter. Any methods in the 'Row' 
+     * class that modify data are set to package private, so that objects 
+     * outside of the 'seatingchart' can only read from the chart, never modify.
+     * 
+     * @return  Array of all Row objects contained within the SeatingChart.
+     */
     public Row[] getRows(){
         return rows;
     }
@@ -41,7 +44,7 @@ public class SeatingChart {
     */
     public boolean checkAvailability(int rowNum, int colNum){
         try{
-            return rows[rowNum-1].getSeats()[colNum-1].available();
+            return rows[rowNum-1].getSeats().get(colNum-1).available();
         }catch(IndexOutOfBoundsException e){
             System.out.printf("Error: Seat at location R%dC%d does not exist.\n", rowNum, colNum);
             throw e;
@@ -57,11 +60,20 @@ public class SeatingChart {
         }
     }
     
-    boolean makeInitialReservations(String seatLocations){
-        return false;
-    }
-    
-    String requestGroupReservation(int numSeats){
+    String requestGroupReservation(int numRequested){
+        /*
+        * Explore this approach:
+        *   Store "available groups" data in "row" objects up-front. Update
+        *   the available groups data every time that a seat is reserved or made
+        *   available.
+        *   More specifically, do the following within the Row class:
+        *     - Store an Array(list?) of "available groups".
+        *     - Somehow, store the corresponding "smallest distance" seat within each available group.
+        *     - When tasked to find the best spot for a group:
+        *       - Sort a row's "available groups" in order from least to greatest "smallest distance seats"
+        *       - Iterate through this list until found an "available group" that is big enough to accomodate the request
+        *       - Compare the row's accommodation avg weight with the found accomodation in each other row
+        */
         return null;
     }
     
