@@ -1,7 +1,6 @@
 package seatingchart;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -9,8 +8,7 @@ import java.util.List;
  */
 public class Row {
     
-    private final List<Seat> seats;
-    private List<Group> availableGroups;
+    private final ArrayList<Seat> seats;
     private int numAvailable;
     private final int rowNum;
     
@@ -21,7 +19,7 @@ public class Row {
         for(int i=0; i<numSeats; i++) seats.add(new Seat(rowNum, i+1, numSeats));
     }
     
-    public List<Seat> getSeats(){
+    public ArrayList<Seat> getSeats(){
         return seats;
     }
     
@@ -37,6 +35,10 @@ public class Row {
     
     String reserveGroup(int groupSize){
         return null;
+    }
+    
+    int getRowNum(){
+        return this.rowNum;
     }
     
 }
