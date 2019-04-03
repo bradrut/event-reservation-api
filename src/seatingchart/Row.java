@@ -9,12 +9,10 @@ import java.util.ArrayList;
 public class Row {
     
     private final ArrayList<Seat> seats;
-    private int numAvailable;
     private final int rowNum;
     
     public Row(int rowNum, int numSeats){
         seats = new ArrayList<>();
-        numAvailable = numSeats;
         this.rowNum = rowNum;
         for(int i=0; i<numSeats; i++) seats.add(new Seat(rowNum, i+1, numSeats));
     }
@@ -23,13 +21,8 @@ public class Row {
         return seats;
     }
     
-    int getNumAvailable(){
-        return numAvailable;
-    }
-    
     String reserveSeat(int colNum){
         seats.get(colNum-1).setAvailability(false);
-        numAvailable--;
         return seats.get(colNum-1).getLocation();
     }
     
