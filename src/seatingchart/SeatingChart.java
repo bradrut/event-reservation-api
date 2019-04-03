@@ -63,65 +63,87 @@ public class SeatingChart {
     }
     
     String reserveSeat(int rowNum, int colNum){
-        if(checkAvailability(rowNum, colNum)){
-            String reservedSeatLoc = rows[rowNum-1].reserveSeat(colNum);
-            numAvailable--;
-            updateAvailableGroups(rows[rowNum-1].getSeats().get(colNum-1));
-            return reservedSeatLoc;
+        Seat seat = rows[rowNum-1].getSeats().get(colNum-1);
+        if(!seat.available()) return null;
+        
+        seat.setAvailability(false);
+        numAvailable--;
+        
+        for(Group group : availableGroups){
+            if(group.getSeatGroup().contains(seat)){
+                updateAvailableGroups(group);
+                break;
+            }
+        }
+        
+        return seat.getLocation();
+    }
+    
+    /**
+     * Reserves a consecutive number of seats in the best location of the given
+     * Group of available seats.
+     * 
+     * @param   numRequested    The number of seats to be reserved.
+     * @param   group           The Group of available seats in which the requested
+     *                          reservations will be fulfilled.
+     * @return  Returns a list containing the seats that were reserved.
+     */
+    private List<Seat> reserveGroup(int numRequested, List<Seat> availableGroup, List<Seat> reservedSeats){
+        Seat bestSeat = availableGroup.get(0);
+        int smallestDist = bestSeat.getDistance();
+        List<Seat> reserved = reservedSeats;
+        
+        for(Seat seat : availableGroup){
+            if(seat.getDistance() < smallestDist){
+                bestSeat = seat;
+                smallestDist = seat.getDistance();
+            }
+        }
+        
+        bestSeat.setAvailability(false);
+        availableGroup.remove(bestSeat);
+        reservedSeats.add(bestSeat);
+        
+        if(numRequested > 1){
+            reserveGroup(numRequested-1, availableGroup, reservedSeats);
+        }
+        
+        return reservedSeats;
+    }
+    
+    String requestGroupReservation(int numRequested){
+        Group targetGroup = null;
+        List<Seat> reservedSeats = null;
+        String startLoc;
+        String endLoc;
+        
+        for(Group group : availableGroups){
+            if(group.getSize() >= numRequested){
+                targetGroup = group;
+                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeatGroup()), new ArrayList());
+                break;
+            }
+        }
+        
+        if(reservedSeats != null){
+            updateAvailableGroups(targetGroup);
+            startLoc = reservedSeats.get(0).getLocation();
+            endLoc = reservedSeats.get(reservedSeats.size()-1).getLocation();
+            return startLoc + " - " + endLoc;
         }else{
             return null;
         }
     }
     
-    String requestGroupReservation(int numRequested){
-        /*
-        * Explore this approach:
-        *   Store "available groups" data in "row" objects up-front. Update
-        *   the available groups data every time that a seat is reserved or made
-        *   available.
-        *   More specifically, do the following within the Row class:
-        *     - Store an Array(list?) of "available groups".
-        *     - Somehow, store the corresponding "smallest distance" seat within each available group.
-        *     - When tasked to find the best spot for a group:
-        *       - Sort a row's "available groups" in order from least to greatest "smallest distance seats"
-        *       - Iterate through this list until found an "available group" that is big enough to accomodate the request
-        *       - Compare the row's accommodation avg weight with the found accomodation in each other row
-        */
-        return null;
-    }
-    
     /**
-     * Updates the available groups within a SeatingChart given a newly reserved
-     * seat.
-     * 
-     * @param seat 
+     * Updates the available groups within a seating chart given a group that
+     * contains any number of consecutively reserved seats.
      */
-    private void updateAvailableGroups(Seat seat){
-        Group oldGroup = null;
-        Group newGroup1 = null;
-        Group newGroup2 = null;
-        
-        for(Group group : availableGroups){
-            if(group.getSeatGroup().contains(seat)){
-                oldGroup = group;
-                ArrayList<Seat> oldSeatGroup = group.getSeatGroup();
-                int reservedSeatIndex = oldSeatGroup.indexOf(seat);
-                int rowNum = group.getRowNum();
-                
-                // Split the old group into two groups around the newly reserved seat.
-                List<Seat> subList1 = oldSeatGroup.subList(0, reservedSeatIndex);
-                List<Seat> subList2 = oldSeatGroup.subList(reservedSeatIndex+1, oldSeatGroup.size());
-                
-                if(!subList1.isEmpty()) newGroup1 = new Group(subList1, rowNum);
-                if(!subList2.isEmpty()) newGroup2 = new Group(subList2, rowNum);
-                
-                break;
-            }
-        }
-        availableGroups.remove(oldGroup);
-        if(newGroup1 != null) insertGroup(newGroup1, availableGroups);
-        if(newGroup2 != null) insertGroup(newGroup2, availableGroups);
-        System.out.println(availableGroups.size());
+    private void updateAvailableGroups(Group group){
+        List<Group> newGroups = group.split();
+        availableGroups.remove(group);
+        if(!newGroups.get(0).getSeatGroup().isEmpty()) insertGroup(newGroups.get(0), availableGroups);
+        if(!newGroups.get(1).getSeatGroup().isEmpty()) insertGroup(newGroups.get(1), availableGroups);
     }
     
     /**
