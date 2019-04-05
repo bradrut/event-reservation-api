@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Represents a seating chart containing a specified number of rows and columns.
+ * The SeatingChart handles requests for individual or group seat reservations,
+ * and keeps track of all available/reserved seats.
+ * 
  * @author Brad Rutkowski
  */
 public class SeatingChart {
@@ -13,8 +16,18 @@ public class SeatingChart {
     private final int numRows;
     private final int numColumns;
     private int numAvailable;
+    
+    /**
+     * ArrayList containing groups of consecutively available seats, sorted by best location.
+     */
     private final ArrayList<Group> availableGroups;
     
+    /**
+     * Constructs a new SeatingChart object given a specified number of rows and columns.
+     * 
+     * @param numRows       The number of rows of seats that the chart will contain.
+     * @param numColumns    The number of columns of seats that the chart will contain.
+     */
     public SeatingChart(int numRows, int numColumns){
         this.numRows = numRows;
         this.numColumns = numColumns;
@@ -28,14 +41,11 @@ public class SeatingChart {
             availableGroups.add(new Group(rows[i].getSeats(), i+1));
         }
     }
-    
+
     /**
-     * Returns the array of Row objects contained within this SeatingChart. This 
-     * method is for use by the SeatingChartPrinter. Any methods in the 'Row' 
-     * class that modify data are set to package private, so that objects 
-     * outside of the 'seatingchart' can only read from the chart, never modify.
+     * Returns an array of all Row objects that this SeatingChart contains.
      * 
-     * @return  Array of all Row objects contained within the SeatingChart.
+     * @return  Returns an array of all Row objects that this SeatingChart contains.
      */
     public Row[] getRows(){
         return rows;
@@ -49,10 +59,17 @@ public class SeatingChart {
         return numColumns;
     }
     
-    public ArrayList<Group> getAvailableGroups(){
-        return availableGroups;
+    int getNumAvailable(){
+        return numAvailable;
     }
     
+    /**
+     * Checks whether a seat at a specified location is available.
+     * 
+     * @param rowNum    The row number of the requested seat.
+     * @param colNum    The column number of the requested seat.
+     * @return          Returns True if the seat is available, and False otherwise.
+     */
     public boolean checkAvailability(int rowNum, int colNum){
         try{
             return rows[rowNum-1].getSeats().get(colNum-1).available();
@@ -62,6 +79,14 @@ public class SeatingChart {
         }
     }
     
+    /**
+     * Requests for a seat at a specified location to be reserved.
+     * 
+     * @param rowNum    The row number of the requested seat.
+     * @param colNum    The column number of the requested seat.
+     * @return      Returns the location of the seat that has been reserved (in the form 'R1C1') in String format.
+     *              If the requested seat is not available, returns null.
+     */
     String reserveSeat(int rowNum, int colNum){
         Seat seat = rows[rowNum-1].getSeats().get(colNum-1);
         if(!seat.available()) return null;
@@ -80,18 +105,31 @@ public class SeatingChart {
     }
     
     /**
-     * Reserves a consecutive number of seats in the best location of the given
-     * Group of available seats.
+     * Given a group of consecutively available seats, reserves a consecutive number of seats 
+     * in the best location of that group.
+     * 
+     * @param numRequested      The number of seats to be reserved.
+     * @param availableGroup    The Group of available seats in which the requested reservations will be placed.
+     * @return                  Returns a list of the Seat objects that have been reserved.
+     */
+    private List<Seat> reserveGroup(int numRequested, List<Seat> availableGroup){
+        return reserveGroup(numRequested, availableGroup, new ArrayList<>());
+    }
+    
+    /**
+     * Recursively reserves a consecutive number of seats in the best location of the provided group.
      * 
      * @param   numRequested    The number of seats to be reserved.
-     * @param   group           The Group of available seats in which the requested
-     *                          reservations will be fulfilled.
+     * @param   availableGroup  The Group of available seats in which the requested
+     *                          reservations will be placed.
+     * @param   reservedSeats   An empty arrayList of seats. This is needed to
+     *                          recursively keep track of each seat that is reserved.
+     * 
      * @return  Returns a list containing the seats that were reserved.
      */
     private List<Seat> reserveGroup(int numRequested, List<Seat> availableGroup, List<Seat> reservedSeats){
         Seat bestSeat = availableGroup.get(0);
         int smallestDist = bestSeat.getDistance();
-        List<Seat> reserved = reservedSeats;
         
         for(Seat seat : availableGroup){
             if(seat.getDistance() < smallestDist){
@@ -102,7 +140,8 @@ public class SeatingChart {
         
         bestSeat.setAvailability(false);
         availableGroup.remove(bestSeat);
-        reservedSeats.add(bestSeat);
+        
+        insertSeat(bestSeat, reservedSeats);
         
         if(numRequested > 1){
             reserveGroup(numRequested-1, availableGroup, reservedSeats);
@@ -111,6 +150,16 @@ public class SeatingChart {
         return reservedSeats;
     }
     
+    /**
+     * Checks whether a requested group of consecutive reservations can be accommodated, and reserves
+     * the seats if possible. The group of seats that are reserved will be the best possible available
+     * location within the seating chart.
+     * 
+     * @param numRequested  The number of consecutive seats to be reserved.
+     * @return              Returns the seat location or range of seat locations that have been reserved.
+     *                      If there is not a group of consecutively available seats that are able to accommodate
+     *                      the request, returns "Not available".
+     */
     String requestGroupReservation(int numRequested){
         Group targetGroup = null;
         List<Seat> reservedSeats = null;
@@ -120,24 +169,34 @@ public class SeatingChart {
         for(Group group : availableGroups){
             if(group.getSize() >= numRequested){
                 targetGroup = group;
-                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeatGroup()), new ArrayList());
+                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeatGroup()));
                 break;
             }
         }
         
         if(reservedSeats != null){
             updateAvailableGroups(targetGroup);
+            numAvailable -= reservedSeats.size();
+            
             startLoc = reservedSeats.get(0).getLocation();
-            endLoc = reservedSeats.get(reservedSeats.size()-1).getLocation();
-            return startLoc + " - " + endLoc;
+            endLoc = reservedSeats.get(numRequested-1).getLocation();
+            
+            if(reservedSeats.size() > 1){
+                return startLoc + " - " + endLoc;
+            }else{
+                return startLoc;
+            }
         }else{
-            return null;
+            return "Not available";
         }
     }
     
     /**
-     * Updates the available groups within a seating chart given a group that
-     * contains any number of consecutively reserved seats.
+     * Updates the list of available groups within this seating chart given a group that
+     * contains any number of consecutively reserved seats. This method should be invoked
+     * any time a new seat or group of seats are reserved.
+     * 
+     * @param group A Group object containing one or more seats that have been marked as reserved.
      */
     private void updateAvailableGroups(Group group){
         List<Group> newGroups = group.split();
@@ -150,7 +209,7 @@ public class SeatingChart {
      * Inserts a given group into a specified sorted ArrayList of groups. The 
      * provided targetList of groups should be sorted primarily by smallest 
      * Manhattan distance, and secondarily by row number. The provided group 
-     * will be inserted in a manner such that the target List will remain sorted. 
+     * will be inserted in such a way that the target List will remain sorted. 
      * 
      * @param   targetList  The list upon which the newGroup will be inserted.
      * @param   newGroup    The group that will be inserted into the targetList.
@@ -163,6 +222,23 @@ public class SeatingChart {
             }
         }
         targetList.add(pos, newGroup);
+    }
+    
+    /**
+     * Inserts a given seat into a sorted List of Seats, ordered by colNum. The provided 
+     * seat will be inserted into the list in such a way that the list will remain sorted.
+     * 
+     * @param seat      The seat to be inserted into the list.
+     * @param seatList  The sorted list of Seats upon which the provided Seat will be inserted.
+     */
+    private void insertSeat(Seat seat, List<Seat> seatList){
+        int pos;
+        for(pos=0; pos<seatList.size(); pos++){
+            if(seat.getColNum() < seatList.get(pos).getColNum()){
+                break;
+            }
+        }
+        seatList.add(pos, seat);
     }
     
 }
