@@ -1,0 +1,3 @@
+javac -d ../build/classes ../src/seatingchart/Driver.java ../src/seatingchart/SeatingChart.java ../src/seatingchart/Row.java ../src/seatingchart/Seat.java ../src/seatingchart/Group.java ../src/chartprinter/SeatingChartPrinter.java -Xlint:unchecked
+cd ../build/classes/
+java seatingchart.Driver
