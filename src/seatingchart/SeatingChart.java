@@ -95,7 +95,7 @@ public class SeatingChart {
         numAvailable--;
         
         for(Group group : availableGroups){
-            if(group.getSeatGroup().contains(seat)){
+            if(group.getSeats().contains(seat)){
                 updateAvailableGroups(group);
                 break;
             }
@@ -169,7 +169,7 @@ public class SeatingChart {
         for(Group group : availableGroups){
             if(group.getSize() >= numRequested){
                 targetGroup = group;
-                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeatGroup()));
+                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeats()));
                 break;
             }
         }
@@ -201,8 +201,8 @@ public class SeatingChart {
     private void updateAvailableGroups(Group group){
         List<Group> newGroups = group.split();
         availableGroups.remove(group);
-        if(!newGroups.get(0).getSeatGroup().isEmpty()) insertGroup(newGroups.get(0), availableGroups);
-        if(!newGroups.get(1).getSeatGroup().isEmpty()) insertGroup(newGroups.get(1), availableGroups);
+        if(!newGroups.get(0).getSeats().isEmpty()) insertGroup(newGroups.get(0), availableGroups);
+        if(!newGroups.get(1).getSeats().isEmpty()) insertGroup(newGroups.get(1), availableGroups);
     }
     
     /**
