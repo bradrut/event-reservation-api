@@ -169,7 +169,7 @@ public class SeatingChart {
         for(Group group : availableGroups){
             if(group.getSize() >= numRequested){
                 targetGroup = group;
-                reservedSeats = reserveGroup(numRequested, new ArrayList(targetGroup.getSeats()));
+                reservedSeats = reserveGroup(numRequested, new ArrayList<>(targetGroup.getSeats()));
                 break;
             }
         }
