@@ -1,6 +1,5 @@
 package seatingchart;
 
-import chartprinter.SeatingChartPrinter;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -9,49 +8,33 @@ import java.util.Scanner;
  * @author Brad Rutkowski
  */
 public class Driver {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-
-        SeatingChart chart = new SeatingChart(3, 11);
-        SeatingChartPrinter printer = new SeatingChartPrinter(chart);
+    
+    private static String[] parseInitialReservations(Scanner scanner){
+        String seatLocations;
         
-        Scanner scanner = new Scanner(System.in);
-        
-        // Retrieve valid input for initial reservations.
-        // Sample input: R1C1 R2C2 R1C6 R2C5 R2C6 R2C11 R3C5
-        String seats = "";
         while(true){
             try{
-                seats = scanner.nextLine();
-                if(seats.matches("(R\\d+C\\d+\\s?)+") || seats.matches("")){
+                seatLocations = scanner.nextLine();
+                if(seatLocations.matches("(R\\d+C\\d+\\s?)+") || seatLocations.matches("")){
                     break;
                 }else{
                     throw new InputMismatchException();
                 }
             }catch(InputMismatchException e){
                 System.out.println("Error: Enter initial reservations in the form 'R1C1', or hit enter.");
-                seats = "";
+                seatLocations = "";
             }
         }
-        
-        //Parse initial reservation seat locations and reserve.
-        if(!seats.equals("")){
-            String[] parsedSeats = seats.split(" ");
-            for(String seatLoc : parsedSeats){
-                String[] parsedLoc = seatLoc.split("R|C");
-                chart.reserveSeat(Integer.parseInt(parsedLoc[1]), Integer.parseInt(parsedLoc[2]));
-            }
-        }
-        
+        return seatLocations.split(" ");
+    }
+    
+    private static void fulfillGroupReservations(SeatingChart chart, Scanner scanner){
         while(true){
             String input;
             try{
                 input = scanner.nextLine();
                 if(input.matches("\\d+") && !input.equals("-1")){
-                    chart.requestGroupReservation(Integer.parseInt(input));
+                    System.out.println(chart.requestGroupReservation(Integer.parseInt(input)));
                 }else if(input.equals("") || input.equals("-1")){
                     break;
                 }else{
@@ -62,11 +45,29 @@ public class Driver {
                 throw e;
             }
         }
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        SeatingChart chart = new SeatingChart(3, 11);
         
-        // TODO: END PROGRAM SEQUENCE (see requirements).
+        try (Scanner scanner = new Scanner(System.in)) {
+            String[] seatLocations = parseInitialReservations(scanner);
+            
+            // Fulfill initial reservations, if any.
+            if(!seatLocations[0].equals("")){
+                for(String seatLoc : seatLocations){
+                    String[] parsedLoc = seatLoc.split("R|C");
+                    chart.reserveSeat(Integer.parseInt(parsedLoc[1]), Integer.parseInt(parsedLoc[2]));
+                }
+            }
+            
+            fulfillGroupReservations(chart, scanner);
+        }
         
-        printer.printAvailability();
-        printer.printDistances();
+        System.out.println(chart.getNumAvailable());
     }
     
 }
