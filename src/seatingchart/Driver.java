@@ -9,6 +9,13 @@ import java.util.Scanner;
  */
 public class Driver {
     
+    /**
+     * Retrieves the locations of all initial seat reservations for the seating chart, from stdin.
+     * 
+     * @param scanner   The scanner that will be used to collect the user input. 
+     *                  Should be initialized with System.in input stream.
+     * @return          Returns an array of all initial reservation locations in String format.
+     */
     private static String[] parseInitialReservations(Scanner scanner){
         String seatLocations;
         
@@ -28,6 +35,12 @@ public class Driver {
         return seatLocations.split(" ");
     }
     
+    /**
+     * Retrieves user input for and fulfills group reservation requests, until the user enters an empty newline or '-1'.
+     * 
+     * @param chart     The SeatingChart object in which group reservations will be fulfilled.
+     * @param scanner   The Scanner that will be used to collect user input. Should be initialized with System.in input stream.
+     */
     private static void fulfillGroupReservations(SeatingChart chart, Scanner scanner){
         while(true){
             String input;
