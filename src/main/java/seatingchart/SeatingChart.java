@@ -59,7 +59,7 @@ public class SeatingChart {
         return numColumns;
     }
     
-    int getNumAvailable(){
+    public int getNumAvailable(){
         return numAvailable;
     }
     
@@ -87,21 +87,34 @@ public class SeatingChart {
      * @return      Returns the location of the seat that has been reserved (in the form 'R1C1') in String format.
      *              If the requested seat is not available, returns null.
      */
-    String reserveSeat(int rowNum, int colNum){
-        Seat seat = rows[rowNum-1].getSeats().get(colNum-1);
-        if(!seat.available()) return null;
+    public String reserveSeat(int rowNum, int colNum){
+        Seat seat;
         
-        seat.setAvailability(false);
-        numAvailable--;
-        
-        for(Group group : availableGroups){
-            if(group.getSeats().contains(seat)){
-                updateAvailableGroups(group);
-                break;
+        try {
+        	seat = rows[rowNum-1].getSeats().get(colNum-1);
+        	
+        	if(!seat.available()) return String.format("Seat %d in row %d is already taken.", colNum, rowNum);
+            
+            seat.setAvailability(false);
+            numAvailable--;
+            
+            for(Group group : availableGroups){
+                if(group.getSeats().contains(seat)){
+                    updateAvailableGroups(group);
+                    break;
+                }
             }
+            
+            return seat.getLocation();
+        }catch(IndexOutOfBoundsException e) {
+        	System.out.println(e.toString() + ", in method reserveSeat.");
+        	
+        	if(rowNum < 1 || rowNum > numRows) {
+        		return String.format("Error: Row %d does not exist.", rowNum);
+        	}else {
+        		return String.format("Error: Seat %d in row %d does not exist.", colNum, rowNum);
+        	}
         }
-        
-        return seat.getLocation();
     }
     
     /**
@@ -160,7 +173,7 @@ public class SeatingChart {
      *                      If there is not a group of consecutively available seats that are able to accommodate
      *                      the request, returns "Not available".
      */
-    String requestGroupReservation(int numRequested){
+    public String requestGroupReservation(int numRequested){
         Group targetGroup = null;
         List<Seat> reservedSeats = null;
         String startLoc;
@@ -187,7 +200,7 @@ public class SeatingChart {
                 return startLoc;
             }
         }else{
-            return "Not available";
+            return "A group of the requested size is not available.";
         }
     }
     
