@@ -7,7 +7,7 @@ import java.util.Scanner;
  *
  * @author Brad Rutkowski
  */
-public class Driver {
+public class Main {
     
     /**
      * Retrieves the locations of all initial seat reservations for the seating chart, from stdin.
