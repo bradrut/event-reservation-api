@@ -1,4 +1,8 @@
-package seatingchart;
+package com.rutkowski.eventreservationapi.service;
+
+import com.rutkowski.eventreservationapi.model.Group;
+import com.rutkowski.eventreservationapi.model.Row;
+import com.rutkowski.eventreservationapi.model.Seat;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package seatingchart;
+package com.rutkowski.eventreservationapi.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class Group {
         return rowNum;
     }
     
-    int getSize(){
+    public int getSize(){
         return size;
     }
     
@@ -72,7 +72,7 @@ public class Group {
      * @return          Returns true if this group holds a better location than the given 
      *                  group, and returns false otherwise.
      */
-    boolean isBetter(Group group){
+    public boolean isBetter(Group group){
         if(smallestDistance < group.getSmallestDistance()){
             return true;
         }else if(smallestDistance == group.getSmallestDistance()){
@@ -89,7 +89,7 @@ public class Group {
      * 
      * @return  Returns an array of groups containing only consecutively available seats.
      */
-    List<Group> split(){
+    public List<Group> split(){
         List<Group> newGroups = new ArrayList<>();
         
         for(int i=0; i<size; i++){

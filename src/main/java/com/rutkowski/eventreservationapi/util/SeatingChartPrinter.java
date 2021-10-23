@@ -1,9 +1,10 @@
-package chartprinter;
+package com.rutkowski.eventreservationapi.util;
+
+import com.rutkowski.eventreservationapi.model.Row;
+import com.rutkowski.eventreservationapi.model.Seat;
+import com.rutkowski.eventreservationapi.service.SeatingChart;
 
 import java.util.List;
-import seatingchart.SeatingChart;
-import seatingchart.Row;
-import seatingchart.Seat;
 
 /**
  *
