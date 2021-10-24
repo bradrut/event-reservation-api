@@ -1,4 +1,4 @@
-package seatingchart;
+package com.rutkowski.eventreservationapi.model;
 
 /**
  * Represents a single seat within a SeatingChart.
@@ -38,7 +38,7 @@ public class Seat {
         return available;
     }
     
-    void setAvailability(boolean available){
+    public void setAvailability(boolean available){
         this.available = available;
     }
     
@@ -46,7 +46,7 @@ public class Seat {
         return manhattanDistance;
     }
     
-    int getColNum(){
+    public int getColNum(){
         return colNum;
     }
     

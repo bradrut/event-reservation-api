@@ -1,3 +1,8 @@
+HELP.md
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
 # Compiled class file
 *.class
 
@@ -33,6 +38,7 @@ dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
+.mvn
 
 .metadata
 bin/
@@ -45,6 +51,21 @@ local.properties
 .settings/
 .loadpath
 .recommenders
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
 
 # External tool builders
 .externalToolBuilders/

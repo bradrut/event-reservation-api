@@ -1,4 +1,4 @@
-package seatingchart;
+package com.rutkowski.eventreservationapi.model;
 
 import java.util.ArrayList;
 
