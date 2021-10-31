@@ -1,5 +1,8 @@
 package com.rutkowski.eventreservationapi.model;
 
+import lombok.Data;
+import org.springframework.data.annotation.PersistenceConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,10 +11,13 @@ import java.util.List;
  * 
  * @author Brad Rutkowski
  */
+@Data
 public class Group {
     
     private final ArrayList<Seat> seats;    /** The List of Seats within this group. */
+
     private final int rowNum;   /** The number of the row in which this Group's seats reside. */
+
     private final int size;     /** The number of seats within this group. */
     
     /**
@@ -32,34 +38,25 @@ public class Group {
         size = this.seats.size();
         setSmallestDistance();
     }
-    
-    
+
+    @PersistenceConstructor
+    private Group(List<Seat> seats, int rowNum, int size){
+        this.seats = new ArrayList<>(seats);
+        this.rowNum = rowNum;
+        this.size = size;
+        setSmallestDistance();
+    }
+
     private void setSmallestDistance(){
         if(!seats.isEmpty()){
-            int dist = seats.get(0).getDistance();
+            int dist = seats.get(0).getManhattanDistance();
             for(Seat seat : seats){
-                if(seat.getDistance() < dist) dist = seat.getDistance();
+                if(seat.getManhattanDistance() < dist) dist = seat.getManhattanDistance();
             }
             smallestDistance = dist;
         }else{
             smallestDistance = -1;
         }
-    }
-    
-    int getSmallestDistance(){
-        return smallestDistance;
-    }
-    
-    public int getRowNum(){
-        return rowNum;
-    }
-    
-    public int getSize(){
-        return size;
-    }
-    
-    public ArrayList<Seat> getSeats(){
-        return this.seats;
     }
     
     /**
@@ -93,14 +90,14 @@ public class Group {
         List<Group> newGroups = new ArrayList<>();
         
         for(int i=0; i<size; i++){
-            if(!seats.get(i).available()){
+            if(!seats.get(i).isAvailable()){
                 newGroups.add(new Group(seats.subList(0, i), rowNum));
                 break;
             }
         }
 
         for(int i=size-1; i>=0; i--){
-            if(!seats.get(i).available()){
+            if(!seats.get(i).isAvailable()){
                 newGroups.add(new Group(seats.subList(i+1, size), rowNum));
                 break;
             }
