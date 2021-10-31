@@ -24,4 +24,10 @@ public class SeatingChartsController {
         return seatingChartsService.create(seatingChartRequest);
     }
 
+    @GetMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.FOUND)
+    public SeatingChart get(@PathVariable String eventId){
+        return seatingChartsService.findByEventId(eventId);
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.rutkowski.eventreservationapi;
+package com.rutkowski.eventreservationapi.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 

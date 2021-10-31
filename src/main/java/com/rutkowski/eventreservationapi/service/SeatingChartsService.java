@@ -1,14 +1,12 @@
 package com.rutkowski.eventreservationapi.service;
 
 import com.rutkowski.eventreservationapi.controller.request.SeatingChartRequest;
-import com.rutkowski.eventreservationapi.model.Group;
-import com.rutkowski.eventreservationapi.model.Row;
-import com.rutkowski.eventreservationapi.model.Seat;
 import com.rutkowski.eventreservationapi.model.SeatingChart;
+import com.rutkowski.eventreservationapi.repository.SeatingChartRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Represents a seating chart containing a specified number of rows and columns.
@@ -20,13 +18,34 @@ import java.util.List;
 @Service
 public class SeatingChartsService {
 
+    private SeatingChartRepository seatingChartRepository;
+
+    @Autowired
+    public SeatingChartsService(SeatingChartRepository seatingChartRepository){
+        this.seatingChartRepository = seatingChartRepository;
+    }
+
     public SeatingChart create(SeatingChartRequest seatingChartRequest){
+        // TODO: Implement idempotency
+
         SeatingChart seatingChart = new SeatingChart(seatingChartRequest.getNumRows(),
                 seatingChartRequest.getNumColumns(),
                 seatingChartRequest.getEventId());
 
-        // TODO: Persist seating chart
+        seatingChartRepository.save(seatingChart);
 
+        return seatingChart;
+    }
+
+    public SeatingChart findByEventId(String eventId){
+        SeatingChart seatingChart;
+        try{
+            seatingChart = seatingChartRepository.findByEventId(eventId);
+        }catch(Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+
+        // TODO: Check for not found
         return seatingChart;
     }
     
